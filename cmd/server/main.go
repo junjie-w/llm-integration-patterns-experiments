@@ -7,7 +7,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/basic_llm_completion"
+	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/embeddings"
+	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/knowledge_rag"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/api/handlers"
+	"github.com/junjie-w/llm-integration-patterns-experiments/internal/store/document"
 	"github.com/junjie-w/llm-integration-patterns-experiments/pkg/config"
 )
 
@@ -17,19 +20,26 @@ func main() {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
-	basicLLMCompletionService := basic_llm_completion.NewService(cfg)
+	docRepo := document.NewRepository()
+	document.SeedDocuments(docRepo)
 
-	basicLLMCompletionHandler := handlers.NewCompletionHandler(basicLLMCompletionService)
+	basicLLMCompletionService := basic_llm_completion.NewService(cfg)
+	embeddingService := embeddings.NewService(cfg)
+	knowledgeService := knowledge_rag.NewService(cfg, docRepo, embeddingService)
+
+	basicLLMCompletionHandler := handlers.NewBasicLLMCompletionHandler(basicLLMCompletionService)
+	knowledgeHandler := handlers.NewKnowledgeRagHandler(knowledgeService)
 
 	r := gin.Default()
 
 	r.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "This project explores practical LLM integration patterns in a customer support API scenario. Welcome:)")
+		c.String(http.StatusOK, "This project explores practical AI development patterns in a customer support API scenario. Welcome:)")
 	})
 
 	api := r.Group("/api/support")
 	{
-		api.POST("/basic-llm-completion", basicLLMCompletionHandler.HandleBasicCompletion)
+		api.POST("/basic-llm-completion", basicLLMCompletionHandler.HandleBasicLLMCompletion)
+		api.POST("/knowledge-rag", knowledgeHandler.HandleKnowledgeRagCompletion)
 	}
 
 	port := os.Getenv("PORT")
