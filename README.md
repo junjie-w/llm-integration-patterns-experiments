@@ -1,5 +1,35 @@
 # LLM Integration Patterns Experiments
 
+This project experiments with various LLM integration patterns: 
+- Basic LLM Completion
+- Knowledge RAG
+- Function Calling
+- Reasoning Agent
+- Multi Agent
+- Evaluation
+
+The official MCP Go SDK and A2A Go SDK are not available yet:/
+
+## Quick Start
+
+```bash
+# Using make
+make run
+
+# Or directly with Go
+go run cmd/server/main.go
+```
+
+This will start the server locally at `http://localhost:8080`.
+
+### API Key Setup
+
+Create a `.env` file in the project root and add your OpenAI API key:
+
+```
+OPENAI_API_KEY=your_api_key_here
+```
+
 ## API Endpoints
 
 ### 1. Basic LLM Completion
@@ -7,7 +37,7 @@
 **Endpoint**: `POST /api/support/basic-llm-completion`
 
 <details>
-<summary><strong>Example Request/Response</strong></summary>
+<summary><strong>Example Request & Response</strong></summary>
 
 **Example Request**
 ```json
@@ -29,7 +59,7 @@
 **Endpoint**: `POST /api/support/knowledge-rag`
 
 <details>
-<summary><strong>Example Request/Response</strong></summary>
+<summary><strong>Example Request & Response</strong></summary>
 
 **Example Request**
 ```json
@@ -111,7 +141,7 @@
 **Endpoint**: `POST /api/support/function-calling`
 
 <details>
-<summary><strong>Example Request/Response</strong></summary>
+<summary><strong>Example Request & Response</strong></summary>
 
 **Example Request**
 ```json
@@ -152,7 +182,7 @@
 **Endpoint**: `POST /api/support/reasoning-agent`
 
 <details>
-<summary><strong>Example Request/Response</strong></summary>
+<summary><strong>Example Request & Response</strong></summary>
 
 **Example Request**
 ```json
@@ -202,22 +232,42 @@
 **Endpoint**: `POST /api/support/multi-agent`
 
 <details>
-<summary><strong>Example Request/Response</strong></summary>
+<summary><strong>Example Request & Response</strong></summary>
 
 **Example Request**
 ```json
 {
-  "message": "I ordered wireless headphones last week but they won't connect to my laptop. The order number is ORD-1234."
+  "message": "My wireless headphones won't connect to my laptop - the Bluetooth pairing keeps failing with error code BT-405. I've updated my laptop's drivers, restarted both devices, and tried resetting the headphones by holding the power button for 10 seconds as shown in the manual. The headphones are fully charged but still won't stay connected for more than a few seconds. The problem started after I installed the latest firmware update (v2.3.1). Is there a compatibility issue with Windows 11? Can you walk me through advanced troubleshooting steps or tell me how to roll back the firmware?"
 }
 ```
 
 **Example Response**
 ```json
 {
-    "conversation_id": "ce6308c5-47dc-426b-aa26-b72455924555",
-    "reply": "Hello,\n\nI'm sorry to hear that you are facing difficulty connecting your wireless headphone to your laptop. To troubleshoot this issue, please follow these steps provided by TechnicalSupport:\n\n1. Ensure the wireless headphone is fully charged.\n2. Put the headphone in pairing mode by following the instructions in the user manual.\n3. On your laptop, navigate to the Bluetooth settings and turn on Bluetooth.\n4. Locate the wireless headphone in the list of available devices and select it to pair.\n5. Enter the default PIN code (usually 0000 or 1234) if required.\n6. Once paired successfully, your laptop should show a notification confirming the connection.\n7. Test the audio output to verify if the headphone is working correctly.\n\nIf you encounter any difficulties, please contact the technical support team at techsupport@example.com for further assistance.\n\nFor updates on your order with the number ORD-1234, I recommend reaching out to our customer support team for the latest information.\n\nShould you have any other questions or concerns, please feel free to let me know.",
+    "conversation_id": "29ecbd3d-c851-4a84-879c-d1b44f892687",
+    "reply": "I'm sorry to hear about the issues you're experiencing with your wireless headphones failing to connect to your laptop and the Bluetooth pairing error code BT-405. Based on the information provided by TechnicalSupport, it seems like the problem could be related to the firmware update. Rolling back the firmware to a previous stable version might help resolve the issue.\n\nHere are some advanced troubleshooting steps to try:\n1. **Roll Back Firmware:**\n   - Visit the headphone manufacturer's website to find and download the previous stable firmware version. Follow the provided instructions to install it on your headphones.\n\n2. **Additional Troubleshooting Steps:**\n   - **Forget the Device:** On your laptop, navigate to Bluetooth settings, forget the headphones, and try pairing them again.\n   - **Safe Mode:** Connect your headphones in Safe Mode to eliminate software interference.\n   - **Check Event Viewer:** Look for Bluetooth-related errors in the Windows Event Viewer for more insights.\n   - **Update Bluetooth Drivers:** Ensure your laptop's Bluetooth drivers are up to date by downloading them from the manufacturer's website.\n\nRegarding Windows 11 compatibility, check the headphone manufacturer's website for any specific information or updated drivers to ensure compatibility.\n\nIf these steps don't resolve the issue, I recommend contacting the headphone manufacturer's technical support team for further assistance. They can offer specific solutions or workarounds for this issue. You can also reach out to our technical support team at [technical support contact information] for specialized assistance with Bluetooth pairing errors and firmware compatibility. Let me know if you need help with any other inquiries.",
     "agents": [
         "TechnicalSupport",
+        "CustomerSupport"
+    ],
+    "complete": true
+}
+```
+
+**Example Request**
+```json
+{
+  "message": "I need to return my order #ORD-7890 for a refund. The wireless earbuds I received have a defect - the right one keeps disconnecting when fully charged. I've already tried resetting them multiple times. What's your return policy for defective items? Do I need a return authorization number? Please send me the shipping label and tell me how long the refund will take to process."
+}
+```
+
+**Example Response**
+```json
+{
+    "conversation_id": "a437d169-c6cd-4f08-acd1-7ee4021581c0",
+    "reply": "Hello,\n\nI am sorry to hear about the issue with the wireless earbuds from order #ORD-7890. We'll do our best to assist you with the return process for the defective item.\n\nBased on our return policy for defective items, you do not need a return authorization number in this case, as confirmed by our Order Specialist. You can simply proceed with the return within 30 days of purchase.\n\nOur team will send you a return shipping label to your email shortly, enabling you to return the defective earbuds with ease. Once we receive the item, our team will inspect it, and the refund process will begin, as mentioned by the Order Specialist. Typically, refunds take around 3-5 business days to process after we receive the returned item.\n\nIf you encounter any difficulties or require further assistance during the process, please do not hesitate to reach out to our customer support team, as advised by Customer Support. They will provide you with the necessary return authorization number and any additional support you may need.\n\nThank you for your understanding, and we are here to help with any further questions or concerns you may have.",
+    "agents": [
+        "OrderSpecialist",
         "CustomerSupport"
     ],
     "complete": true
@@ -230,7 +280,7 @@
 **Evaluation Endpoint**: `POST /api/support/evaluate`
 
 <details>
-<summary><strong>Example Request/Response</strong></summary>
+<summary><strong>Example Request & Response</strong></summary>
 
 **Example Request**
 ```json
@@ -304,7 +354,7 @@
 **Report Retrieval Endpoint**: `GET /api/support/evaluate/report/:id`
 
 <details>
-<summary><strong>Example Request/Response</strong></summary>
+<summary><strong>Example Request & Response</strong></summary>
 
 **Example Request**
 ```
@@ -367,3 +417,15 @@ GET /api/support/evaluate/report/786ec6ab-0845-48a2-8aaf-c4e96834ea2e
 }
 ```
 </details>
+
+## Project Structure
+
+- `cmd/server`: Main application entry point
+- `internal/ai`: Implementation of LLM integration patterns
+- `internal/api`: HTTP handlers and routes
+- `internal/store`: Data repositories and models
+- `pkg/config`: API key configuration
+
+## Next
+
+- Tests
