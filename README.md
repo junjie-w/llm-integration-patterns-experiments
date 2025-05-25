@@ -105,3 +105,44 @@
 }
 ```
 </details>
+
+### 3. Function Calling
+
+**Endpoint**: `POST /api/support/function-calling`
+
+<details>
+<summary><strong>Example Request/Response</strong></summary>
+
+**Example Request**
+```json
+{
+  "message": "What's the status of my order ORD-1234?"
+}
+```
+
+**Example Response**
+```json
+{
+  "reply": "I've checked your order ORD-1234. It's currently in the 'Shipped' status and is being delivered by FedEx. The estimated delivery date is May 26, 2025. You can track your package using the tracking number TRK772807.",
+  "tool_calls": [
+    {
+      "name": "customer_info",
+      "arguments": {
+        "query_type": "shipping",
+        "order_id": "ORD-1234"
+      },
+      "result": {
+        "order_id": "ORD-1234",
+        "status": "Shipped",
+        "shipping_info": {
+          "carrier": "FedEx",
+          "estimated_delivery": "2025-05-26",
+          "status": "In Transit",
+          "tracking_number": "TRK772807"
+        }
+      }
+    }
+  ]
+}
+```
+</details>
