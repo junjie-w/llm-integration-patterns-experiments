@@ -196,3 +196,31 @@
 }
 ```
 </details>
+
+### 5. Multi Agent
+
+**Endpoint**: `POST /api/support/multi-agent`
+
+<details>
+<summary><strong>Example Request/Response</strong></summary>
+
+**Example Request**
+```json
+{
+  "message": "I ordered wireless headphones last week but they won't connect to my laptop. The order number is ORD-1234."
+}
+```
+
+**Example Response**
+```json
+{
+    "conversation_id": "ce6308c5-47dc-426b-aa26-b72455924555",
+    "reply": "Hello,\n\nI'm sorry to hear that you are facing difficulty connecting your wireless headphone to your laptop. To troubleshoot this issue, please follow these steps provided by TechnicalSupport:\n\n1. Ensure the wireless headphone is fully charged.\n2. Put the headphone in pairing mode by following the instructions in the user manual.\n3. On your laptop, navigate to the Bluetooth settings and turn on Bluetooth.\n4. Locate the wireless headphone in the list of available devices and select it to pair.\n5. Enter the default PIN code (usually 0000 or 1234) if required.\n6. Once paired successfully, your laptop should show a notification confirming the connection.\n7. Test the audio output to verify if the headphone is working correctly.\n\nIf you encounter any difficulties, please contact the technical support team at techsupport@example.com for further assistance.\n\nFor updates on your order with the number ORD-1234, I recommend reaching out to our customer support team for the latest information.\n\nShould you have any other questions or concerns, please feel free to let me know.",
+    "agents": [
+        "TechnicalSupport",
+        "CustomerSupport"
+    ],
+    "complete": true
+}
+```
+</details>
