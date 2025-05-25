@@ -224,3 +224,146 @@
 }
 ```
 </details>
+
+### 6. Evaluation
+
+**Evaluation Endpoint**: `POST /api/support/evaluate`
+
+<details>
+<summary><strong>Example Request/Response</strong></summary>
+
+**Example Request**
+```json
+{
+  "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+  "pattern_types": ["basic_llm_completion", "knowledge_rag", "function_calling", "reasoning_agent", "multi_agent"]
+}
+```
+
+**Example Response**
+```json
+{
+    "report_id": "786ec6ab-0845-48a2-8aaf-c4e96834ea2e",
+    "report": {
+        "id": "786ec6ab-0845-48a2-8aaf-c4e96834ea2e",
+        "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+        "timestamp": "2025-05-25T13:56:08.889893+02:00",
+        "results": [
+            {
+                "id": "4f4652ef-4334-42ba-b3a6-ac866661a83e",
+                "pattern_type": "basic_llm_completion",
+                "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+                "response": "I apologize for the delay in receiving your headphones. Let me check the status of your order with order number ORD-1234 and get back to you shortly. Thank you for your patience.",
+                "response_time_ms": 694,
+                "auto_rating": 0.7,
+                "evaluation_notes": "\nExplanation: The response is relevant as it acknowledges the delay in receiving the headphones and mentions checking the status of the order number provided. It shows accuracy by referring to the specific order number. While it is not yet complete in providing a solution, it assures the customer that they will get back shortly. The response is clear and offers reassurance, which is helpful in managing customer expectations."
+            },
+            {
+                "id": "bb989249-7854-4cb2-b219-5038c02cb729",
+                "pattern_type": "knowledge_rag",
+                "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+                "response": "I'm sorry to hear about the delay in receiving your headphones. To investigate further, I recommend contacting our customer support team with your order number ORD-1234. They will assist you in tracking your order and providing an update on its status.",
+                "response_time_ms": 1161,
+                "auto_rating": 0.8,
+                "evaluation_notes": "\nExplanation: The response is relevant as it directly acknowledges the delay in receiving the headphones and provides a solution to track the order with the order number provided. The information appears accurate, complete, and clear, guiding the customer on the next steps to take. It is helpful by offering a specific course of action to address the issue. The response could be improved by including an apology for the inconvenience caused."
+            },
+            {
+                "id": "d550e8f0-8ba8-49bc-9206-2c75e2daf0c4",
+                "pattern_type": "function_calling",
+                "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+                "response": "I found the information regarding your order:\n\n- Order Status: **Cancelled**\n- Shipping Carrier: **FedEx**\n- Tracking Number: **TRK834061**\n- Estimated Delivery Date: **2025-05-28**\n\nIt seems like your order has been cancelled. If you have any further questions or need assistance, feel free to let me know.",
+                "response_time_ms": 1461,
+                "auto_rating": 0.6,
+                "evaluation_notes": "\nExplanation: The response partially addresses the query by providing relevant information about the order status being cancelled. However, it lacks accuracy as it states the estimated delivery date in the future instead of acknowledging the cancellation. It is somewhat complete but could be clearer by explicitly stating the reason for cancellation and offering assistance on next steps. Overall, it falls in the average category for addressing the query with a few issues."
+            },
+            {
+                "id": "a586cd14-5dd7-4153-bb2a-1b5125d24b70",
+                "pattern_type": "reasoning_agent",
+                "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+                "response": "The headphones you ordered with the order number ORD-1234 have been shipped via FedEx. The current status is \"Out for Delivery,\" and the estimated delivery date is May 28, 2025. You can track your package using the tracking number TRK411121 provided.",
+                "response_time_ms": 1267,
+                "auto_rating": 0.9,
+                "evaluation_notes": "\nExplanation: The response is excellent. It directly addresses the query by providing the current status of the order, the shipping information, and ways to track the package. The information is accurate, complete, clear, and highly helpful to the customer."
+            },
+            {
+                "id": "31b4193a-dd4a-4151-b1bd-7a971fcc83b6",
+                "pattern_type": "multi_agent",
+                "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+                "response": "I apologize for the delay in receiving your headphones. Let me check the status of your order ORD-1234 for you. Please allow me a moment to investigate this for you.",
+                "response_time_ms": 503,
+                "auto_rating": 0.9,
+                "evaluation_notes": "\nExplanation: The response addresses the query directly by acknowledging the delay in receiving the headphones and mentioning the order number. The customer support representative also assures the customer of checking the status of the order, which shows readiness to assist. The response is clear, concise, and likely to be helpful in resolving the customer's issue promptly."
+            }
+        ]
+    }
+}
+```
+</details>
+
+
+**Report Retrieval Endpoint**: `GET /api/support/evaluate/report/:id`
+
+<details>
+<summary><strong>Example Request/Response</strong></summary>
+
+**Example Request**
+```
+GET /api/support/evaluate/report/786ec6ab-0845-48a2-8aaf-c4e96834ea2e
+```
+
+**Example Response**
+```json
+{
+    "id": "786ec6ab-0845-48a2-8aaf-c4e96834ea2e",
+    "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+    "timestamp": "2025-05-25T13:56:08.889893+02:00",
+    "results": [
+        {
+            "id": "4f4652ef-4334-42ba-b3a6-ac866661a83e",
+            "pattern_type": "basic_llm_completion",
+            "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+            "response": "I apologize for the delay in receiving your headphones. Let me check the status of your order with order number ORD-1234 and get back to you shortly. Thank you for your patience.",
+            "response_time_ms": 694,
+            "auto_rating": 0.7,
+            "evaluation_notes": "\nExplanation: The response is relevant as it acknowledges the delay in receiving the headphones and mentions checking the status of the order number provided. It shows accuracy by referring to the specific order number. While it is not yet complete in providing a solution, it assures the customer that they will get back shortly. The response is clear and offers reassurance, which is helpful in managing customer expectations."
+        },
+        {
+            "id": "bb989249-7854-4cb2-b219-5038c02cb729",
+            "pattern_type": "knowledge_rag",
+            "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+            "response": "I'm sorry to hear about the delay in receiving your headphones. To investigate further, I recommend contacting our customer support team with your order number ORD-1234. They will assist you in tracking your order and providing an update on its status.",
+            "response_time_ms": 1161,
+            "auto_rating": 0.8,
+            "evaluation_notes": "\nExplanation: The response is relevant as it directly acknowledges the delay in receiving the headphones and provides a solution to track the order with the order number provided. The information appears accurate, complete, and clear, guiding the customer on the next steps to take. It is helpful by offering a specific course of action to address the issue. The response could be improved by including an apology for the inconvenience caused."
+        },
+        {
+            "id": "d550e8f0-8ba8-49bc-9206-2c75e2daf0c4",
+            "pattern_type": "function_calling",
+            "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+            "response": "I found the information regarding your order:\n\n- Order Status: **Cancelled**\n- Shipping Carrier: **FedEx**\n- Tracking Number: **TRK834061**\n- Estimated Delivery Date: **2025-05-28**\n\nIt seems like your order has been cancelled. If you have any further questions or need assistance, feel free to let me know.",
+            "response_time_ms": 1461,
+            "auto_rating": 0.6,
+            "evaluation_notes": "\nExplanation: The response partially addresses the query by providing relevant information about the order status being cancelled. However, it lacks accuracy as it states the estimated delivery date in the future instead of acknowledging the cancellation. It is somewhat complete but could be clearer by explicitly stating the reason for cancellation and offering assistance on next steps. Overall, it falls in the average category for addressing the query with a few issues."
+        },
+        {
+            "id": "a586cd14-5dd7-4153-bb2a-1b5125d24b70",
+            "pattern_type": "reasoning_agent",
+            "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+            "response": "The headphones you ordered with the order number ORD-1234 have been shipped via FedEx. The current status is \"Out for Delivery,\" and the estimated delivery date is May 28, 2025. You can track your package using the tracking number TRK411121 provided.",
+            "response_time_ms": 1267,
+            "auto_rating": 0.9,
+            "evaluation_notes": "\nExplanation: The response is excellent. It directly addresses the query by providing the current status of the order, the shipping information, and ways to track the package. The information is accurate, complete, clear, and highly helpful to the customer."
+        },
+        {
+            "id": "31b4193a-dd4a-4151-b1bd-7a971fcc83b6",
+            "pattern_type": "multi_agent",
+            "query": "I ordered headphones last week but they haven't arrived yet. My order number is ORD-1234.",
+            "response": "I apologize for the delay in receiving your headphones. Let me check the status of your order ORD-1234 for you. Please allow me a moment to investigate this for you.",
+            "response_time_ms": 503,
+            "auto_rating": 0.9,
+            "evaluation_notes": "\nExplanation: The response addresses the query directly by acknowledging the delay in receiving the headphones and mentioning the order number. The customer support representative also assures the customer of checking the status of the order, which shows readiness to assist. The response is clear, concise, and likely to be helpful in resolving the customer's issue promptly."
+        }
+    ]
+}
+```
+</details>
