@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/basic_llm_completion"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/embeddings"
+	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/evaluation"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/function_calling"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/knowledge_rag"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/multi_agent"
@@ -41,12 +42,21 @@ func main() {
 	functionCallingService := function_calling.NewService(cfg, toolRegistry)
 	reasoningAgentService := reasoning_agent.NewService(cfg, toolRegistry)
 	multiAgentService := multi_agent.NewService(cfg)
+	evaluationService := evaluation.NewService(
+		cfg,
+		basicLLMCompletionService,
+		knowledgeService,
+		functionCallingService,
+		reasoningAgentService,
+		multiAgentService,
+	)
 
 	basicLLMCompletionHandler := handlers.NewBasicLLMCompletionHandler(basicLLMCompletionService)
 	knowledgeHandler := handlers.NewKnowledgeRagHandler(knowledgeService)
 	functionCallingHandler := handlers.NewFunctionCallingHandler(functionCallingService)
  	reasoningAgentHandler := handlers.NewReasoningAgentHandler(reasoningAgentService)
   multiAgentHandler := handlers.NewMultiAgentHandler(multiAgentService)
+	evaluationHandler := handlers.NewEvaluationHandler(evaluationService)
 
 	r := gin.Default()
 
@@ -61,6 +71,8 @@ func main() {
 		api.POST("/function-calling", functionCallingHandler.HandleFunctionCallingCompletion)
 		api.POST("/reasoning-agent", reasoningAgentHandler.HandleReasoningAgentExecution)
 		api.POST("/multi-agent", multiAgentHandler.HandleMultiAgentProcess)
+		api.POST("/evaluate", evaluationHandler.HandleEvaluate)
+		api.GET("/evaluate/report/:id", evaluationHandler.HandleGetReport)
 	}
 
 	port := os.Getenv("PORT")
