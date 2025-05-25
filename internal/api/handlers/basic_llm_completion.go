@@ -7,17 +7,17 @@ import (
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/basic_llm_completion"
 )
 
-type CompletionHandler struct {
+type BaiscLLMCompletionHandler struct {
 	service *basic_llm_completion.Service
 }
 
-func NewCompletionHandler(service *basic_llm_completion.Service) *CompletionHandler {
-	return &CompletionHandler{
+func NewBasicLLMCompletionHandler(service *basic_llm_completion.Service) *BaiscLLMCompletionHandler {
+	return &BaiscLLMCompletionHandler{
 		service: service,
 	}
 }
 
-func (h *CompletionHandler) HandleBasicCompletion(c *gin.Context) {
+func (h *BaiscLLMCompletionHandler) HandleBasicLLMCompletion(c *gin.Context) {
 	var req basic_llm_completion.Request
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format"})
