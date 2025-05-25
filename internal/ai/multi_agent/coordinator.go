@@ -29,8 +29,8 @@ func (c *Coordinator) RegisterAgent(agent Agent) {
 
 func (c *Coordinator) StartConversation(ctx context.Context, query string) (*Conversation, error) {
 	conversation := NewConversation(query)
-	
-	bestAgent, err := c.selectAgent(ctx, query)
+
+	bestAgent, err := c.selectAgent(query)
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +54,8 @@ func (c *Coordinator) StartConversation(ctx context.Context, query string) (*Con
 	
 	if c.shouldDelegate(response.Content) {
 		topic := c.extractDelegationTopic(response.Content)
-		
-		nextAgent, err := c.selectAgentForTopic(ctx, topic)
+
+		nextAgent, err := c.selectAgentForTopic(topic)
 		if err != nil {
 			return nil, err
 		}
@@ -148,7 +148,7 @@ func (c *Coordinator) extractDelegationTopic(content string) string {
 	}
 }
 
-func (c *Coordinator) selectAgentForTopic(ctx context.Context, topic string) (Agent, error) {
+func (c *Coordinator) selectAgentForTopic(topic string) (Agent, error) {
 	topic = strings.ToLower(topic)
 	
 	for _, agent := range c.agents {
@@ -165,31 +165,58 @@ func (c *Coordinator) selectAgentForTopic(ctx context.Context, topic string) (Ag
 	return nil, fmt.Errorf("no agent found for topic: %s", topic)
 }
 
-func (c *Coordinator) selectAgent(ctx context.Context, query string) (Agent, error) {
+func (c *Coordinator) selectAgent(query string) (Agent, error) {
     lowerQuery := strings.ToLower(query)
     
+    technicalMatches := 0
+    orderMatches := 0
+    customerMatches := 0
+    
     technicalPatterns := []string{"connect", "pair", "troubleshoot", "not working", 
-                                "error", "issue", "problem", "broken", "fix", "help with"}
-                                
+                               "error", "issue", "problem", "broken", "fix", "help with"}
+                               
     orderPatterns := []string{"order", "delivery", "shipping", "package", 
-                             "tracking", "return", "refund"}
+                            "tracking", "return", "refund", "address", "receipt"}
+                            
+    customerPatterns := []string{"account", "login", "password", "policy", "contact", 
+                               "support", "help", "subscription", "membership", 
+                               "question", "feedback", "complaint"}
     
     for _, pattern := range technicalPatterns {
         if strings.Contains(lowerQuery, pattern) {
-            for _, agent := range c.agents {
-                if strings.Contains(strings.ToLower(agent.GetExpertise()), "technical") {
-                    return agent, nil
-                }
-            }
+            technicalMatches++
         }
     }
     
     for _, pattern := range orderPatterns {
         if strings.Contains(lowerQuery, pattern) {
-            for _, agent := range c.agents {
-                if strings.Contains(strings.ToLower(agent.GetExpertise()), "order") {
-                    return agent, nil
-                }
+            orderMatches++
+        }
+    } 
+    
+    for _, pattern := range customerPatterns {
+        if strings.Contains(lowerQuery, pattern) {
+            customerMatches++
+        }
+    }
+    
+    if orderMatches > 0 && (orderMatches >= technicalMatches || 
+       strings.Contains(lowerQuery, "return") || strings.Contains(lowerQuery, "refund")) {
+        for _, agent := range c.agents {
+            if strings.Contains(strings.ToLower(agent.GetExpertise()), "order") {
+                return agent, nil
+            }
+        }
+    } else if technicalMatches > 0 && technicalMatches >= customerMatches {
+        for _, agent := range c.agents {
+            if strings.Contains(strings.ToLower(agent.GetExpertise()), "technical") {
+                return agent, nil
+            }
+        }
+    } else if customerMatches > 0 {
+        for _, agent := range c.agents {
+            if strings.Contains(strings.ToLower(agent.GetExpertise()), "customer") {
+                return agent, nil
             }
         }
     }
