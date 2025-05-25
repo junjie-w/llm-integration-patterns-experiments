@@ -5,9 +5,15 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/junjie-w/llm-integration-patterns-experiments/pkg/config"
 )
 
 func main() {
+	_, err := config.Load()
+	if err != nil {
+		log.Fatalf("Failed to load configuration: %v", err)
+	}
+	
 	r := gin.Default()
 
 	r.GET("/", func(c *gin.Context) {
