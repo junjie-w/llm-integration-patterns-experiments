@@ -146,3 +146,53 @@
 }
 ```
 </details>
+
+### 4. Reasoning Agent
+
+**Endpoint**: `POST /api/support/reasoning-agent`
+
+<details>
+<summary><strong>Example Request/Response</strong></summary>
+
+**Example Request**
+```json
+{
+  "message": "I ordered headphones last week (order ID: ORD-1234) but I just noticed they were shipped to my old address. I need to know if they were delivered yet, and if not, can I still change the delivery address?"
+}
+```
+
+**Example Response**
+```json
+{
+  "agent_id": "41149034-e7f1-456f-9cae-d4dc4b981e15",
+  "answer": "The headphones with order ID ORD-1234 have been shipped via UPS with a tracking number TRK485533. The estimated delivery date is May 26, 2025, and the current status is \"Order Placed.\" The order status is \"Processing,\" which means it has not been delivered yet. Since the order is still in processing, there is a possibility to change the delivery address. I recommend contacting customer support as soon as possible to request a change in the delivery address for your order.",
+  "complete": true,
+  "steps": [
+    {
+      "type": "action",
+      "content": "Using tool 'customer_info' with args: {\"order_id\":\"ORD-1234\",\"query_type\":\"shipping\"}"
+    },
+    {
+      "type": "observation",
+      "content": "{\n  \"customer_email\": \"customer@example.com\",\n  \"date\": \"2025-05-03\",\n  \"items\": 1,\n  \"order_id\": \"ORD-1234\",\n  \"shipping_info\": {\n    \"carrier\": \"UPS\",\n    \"estimated_delivery\": \"2025-05-26\",\n    \"status\": \"Order Placed\",\n    \"tracking_number\": \"TRK485533\"\n  },\n  \"status\": \"Shipped\",\n  \"total_amount\": \"$105.53\"\n}"
+    },
+    {
+      "type": "thought",
+      "content": "Thought: The headphones with order ID ORD-1234 have been shipped via UPS with a tracking number TRK485533. The estimated delivery date is May 26, 2025. The current status is \"Order Placed.\"\n\nAction: I will check if the delivery address can still be changed for this order."
+    },
+    {
+      "type": "action",
+      "content": "Using tool 'customer_info' with args: {\"order_id\":\"ORD-1234\",\"query_type\":\"order\"}"
+    },
+    {
+      "type": "observation",
+      "content": "{\n  \"customer_email\": \"customer@example.com\",\n  \"date\": \"2025-05-04\",\n  \"items\": 3,\n  \"order_id\": \"ORD-1234\",\n  \"status\": \"Processing\",\n  \"total_amount\": \"$111.19\"\n}"
+    },
+    {
+      "type": "answer",
+      "content": "The headphones with order ID ORD-1234 have been shipped via UPS with a tracking number TRK485533. The estimated delivery date is May 26, 2025, and the current status is \"Order Placed.\"\n\nThe order status is \"Processing,\" which means it has not been delivered yet. Since the order is still in processing, there is a possibility to change the delivery address. I recommend contacting customer support as soon as possible to request a change in the delivery address for your order."
+    }
+  ]
+}
+```
+</details>
