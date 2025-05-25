@@ -2,19 +2,26 @@ package main
 
 import (
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/basic_llm_completion"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/embeddings"
+	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/function_calling"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/knowledge_rag"
+	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/tool"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/api/handlers"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/store/document"
 	"github.com/junjie-w/llm-integration-patterns-experiments/pkg/config"
 )
 
 func main() {
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	_ = rng
+
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
@@ -23,12 +30,17 @@ func main() {
 	docRepo := document.NewRepository()
 	document.SeedDocuments(docRepo)
 
+	toolRegistry := tool.NewRegistry()
+	tool.RegisterSupportTools(toolRegistry)
+
 	basicLLMCompletionService := basic_llm_completion.NewService(cfg)
 	embeddingService := embeddings.NewService(cfg)
 	knowledgeService := knowledge_rag.NewService(cfg, docRepo, embeddingService)
+	functionCallingService := function_calling.NewService(cfg, toolRegistry)
 
 	basicLLMCompletionHandler := handlers.NewBasicLLMCompletionHandler(basicLLMCompletionService)
 	knowledgeHandler := handlers.NewKnowledgeRagHandler(knowledgeService)
+	functionCallingHandler := handlers.NewFunctionCallingHandler(functionCallingService)
 
 	r := gin.Default()
 
@@ -40,6 +52,7 @@ func main() {
 	{
 		api.POST("/basic-llm-completion", basicLLMCompletionHandler.HandleBasicLLMCompletion)
 		api.POST("/knowledge-rag", knowledgeHandler.HandleKnowledgeRagCompletion)
+		api.POST("/function-calling", functionCallingHandler.HandleFunctionCallingCompletion)
 	}
 
 	port := os.Getenv("PORT")
