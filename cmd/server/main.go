@@ -12,6 +12,7 @@ import (
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/embeddings"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/function_calling"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/knowledge_rag"
+	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/multi_agent"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/reasoning_agent"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/ai/tool"
 	"github.com/junjie-w/llm-integration-patterns-experiments/internal/api/handlers"
@@ -39,11 +40,13 @@ func main() {
 	knowledgeService := knowledge_rag.NewService(cfg, docRepo, embeddingService)
 	functionCallingService := function_calling.NewService(cfg, toolRegistry)
 	reasoningAgentService := reasoning_agent.NewService(cfg, toolRegistry)
+	multiAgentService := multi_agent.NewService(cfg)
 
 	basicLLMCompletionHandler := handlers.NewBasicLLMCompletionHandler(basicLLMCompletionService)
 	knowledgeHandler := handlers.NewKnowledgeRagHandler(knowledgeService)
 	functionCallingHandler := handlers.NewFunctionCallingHandler(functionCallingService)
  	reasoningAgentHandler := handlers.NewReasoningAgentHandler(reasoningAgentService)
+  multiAgentHandler := handlers.NewMultiAgentHandler(multiAgentService)
 
 	r := gin.Default()
 
@@ -57,6 +60,7 @@ func main() {
 		api.POST("/knowledge-rag", knowledgeHandler.HandleKnowledgeRagCompletion)
 		api.POST("/function-calling", functionCallingHandler.HandleFunctionCallingCompletion)
 		api.POST("/reasoning-agent", reasoningAgentHandler.HandleReasoningAgentExecution)
+		api.POST("/multi-agent", multiAgentHandler.HandleMultiAgentProcess)
 	}
 
 	port := os.Getenv("PORT")
