@@ -2,6 +2,8 @@ package multi_agent
 
 import (
 	"context"
+	"math"
+	"strings"
 
 	"github.com/junjie-w/llm-integration-patterns-experiments/pkg/config"
 	"github.com/sashabaranov/go-openai"
@@ -92,7 +94,19 @@ order-specific details), say you'll delegate it to a specialist. Be helpful, con
 }
 
 func (a *CustomerSupportAgent) CanHandle(query string) float64 {
-	return 0.8
+	query = strings.ToLower(query)
+	keywords := []string{"account", "login", "password", "policy", "contact", "feedback", 
+		"complaint", "question", "help", "support", "subscription", "membership"}
+	
+	score := 0.5
+	matches := 0
+	for _, keyword := range keywords {
+		if strings.Contains(query, keyword) {
+			score += 0.1
+			matches++
+		}
+	}
+	return math.Min(score, 0.9)
 }
 
 func (a *CustomerSupportAgent) ProcessMessage(ctx context.Context, message Message) (Message, error) {
@@ -125,7 +139,23 @@ you'll delegate it to customer support.`,
 }
 
 func (a *TechnicalSupportAgent) CanHandle(query string) float64 {
-	return 0.5
+	query = strings.ToLower(query)
+	keywords := []string{"troubleshoot", "connect", "pair", "bluetooth", "reset", "not working", 
+		"broken", "error", "issue", "problem", "battery", "charging", "firmware", "update", 
+		"sound", "audio", "wireless", "manual", "instructions"}
+	
+	score := 0.3
+	matches := 0
+	for _, keyword := range keywords {
+		if strings.Contains(query, keyword) {
+			score += 0.15
+			matches++
+		}
+	}
+	if matches >= 3 {
+		score += 0.1
+	}
+	return math.Min(score, 0.95)
 }
 
 func (a *TechnicalSupportAgent) ProcessMessage(ctx context.Context, message Message) (Message, error) {
@@ -158,7 +188,23 @@ you'll delegate it to the appropriate team.`,
 }
 
 func (a *OrderSpecialistAgent) CanHandle(query string) float64 {
-	return 0.6
+	query = strings.ToLower(query)
+	keywords := []string{"order", "shipping", "delivery", "package", "tracking", 
+		"return", "refund", "replacement", "warranty", "receipt", "payment", "status", 
+		"expedited", "delay", "address", "inventory", "availability"}
+	
+	score := 0.4
+	matches := 0
+	for _, keyword := range keywords {
+		if strings.Contains(query, keyword) {
+			score += 0.15
+			matches++
+		}
+	}
+	if matches >= 2 {
+		score += 0.2
+	}
+	return math.Min(score, 0.99)
 }
 
 func (a *OrderSpecialistAgent) ProcessMessage(ctx context.Context, message Message) (Message, error) {
